@@ -1,0 +1,239 @@
+local player = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "AbilitiesMenu"
+gui.ResetOnSpawn = false -- Это предотвратит исчезновение GUI после смерти
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Основной контейнер
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 250, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -125, 0.5, -125)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = gui
+
+-- Добавляем скругление углов
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- Верхняя панель для перемещения
+local dragFrame = Instance.new("Frame")
+dragFrame.Name = "DragFrame"
+dragFrame.Size = UDim2.new(1, 0, 0, 30)
+dragFrame.Position = UDim2.new(0, 0, 0, 0)
+dragFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+dragFrame.BorderSizePixel = 0
+dragFrame.Parent = mainFrame
+
+-- Скругление только сверху
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 8)
+topCorner.Parent = dragFrame
+
+-- Текст заголовка
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, -60, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Способности"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 16
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = dragFrame
+
+-- Кнопка сворачивания
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -30, 0, 0)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Text = "_"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextSize = 18
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.Parent = dragFrame
+
+-- Контейнер для кнопок
+local buttonsFrame = Instance.new("Frame")
+buttonsFrame.Name = "ButtonsFrame"
+buttonsFrame.Size = UDim2.new(1, -10, 1, -40)
+buttonsFrame.Position = UDim2.new(0, 5, 0, 35)
+buttonsFrame.BackgroundTransparency = 1
+buttonsFrame.Parent = mainFrame
+
+-- Кнопка для развертывания (когда меню свернуто)
+local restoreButton = Instance.new("TextButton")
+restoreButton.Name = "RestoreButton"
+restoreButton.Size = UDim2.new(0, 80, 0, 30)
+restoreButton.Position = UDim2.new(0, 10, 0, 10)
+restoreButton.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+restoreButton.BorderSizePixel = 0
+restoreButton.Text = "Меню >>"
+restoreButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+restoreButton.TextSize = 14
+restoreButton.Font = Enum.Font.Gotham
+restoreButton.Visible = false
+restoreButton.Parent = gui
+
+-- Добавляем скругление к кнопке восстановления
+local restoreCorner = Instance.new("UICorner")
+restoreCorner.CornerRadius = UDim.new(0, 6)
+restoreCorner.Parent = restoreButton
+
+-- Создаем 5 кнопок способностей
+local buttonData = {
+    {
+        Name = "Остановить время",
+        Ability = "Time Stop",
+        Color = Color3.fromRGB(100, 150, 255)
+    },
+    {
+        Name = "Разрыв вселенной",
+        Ability = "Reality Break",
+        Color = Color3.fromRGB(255, 100, 150)
+    },
+    {
+        Name = "Регенерация",
+        Ability = "Regeneration",
+        Color = Color3.fromRGB(100, 255, 150)
+    },
+    {
+        Name = "Наоборот",
+        Ability = "Reverse Surge",
+        Color = Color3.fromRGB(255, 150, 100)
+    },
+    {
+        Name = "Видение",
+        Ability = "Vision",
+        Color = Color3.fromRGB(150, 100, 255) -- Фиолетовый цвет для кнопки "Видение"
+    }
+}
+
+for i, data in ipairs(buttonData) do
+    local button = Instance.new("TextButton")
+    button.Name = data.Name
+    button.Size = UDim2.new(1, 0, 0, 40)
+    button.Position = UDim2.new(0, 0, 0, (i-1)*42)
+    button.BackgroundColor3 = data.Color
+    button.BorderSizePixel = 0
+    button.Text = data.Name
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 14
+    button.Font = Enum.Font.Gotham
+    button.Parent = buttonsFrame
+    
+    -- Добавляем скругление к кнопкам
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 6)
+    buttonCorner.Parent = button
+    
+    -- Эффекты при наведении
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(
+            math.min(data.Color.R * 255 + 30, 255)/255,
+            math.min(data.Color.G * 255 + 30, 255)/255,
+            math.min(data.Color.B * 255 + 30, 255)/255
+        )
+    end)
+    
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = data.Color
+    end)
+    
+    -- Обработчик нажатия
+    button.MouseButton1Click:Connect(function()
+        local args = {
+            game:GetService("ReplicatedStorage"):WaitForChild("Game"):WaitForChild("Abilities"):WaitForChild(data.Ability)
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Game"):WaitForChild("Events"):WaitForChild("EquipAbility"):FireServer(unpack(args))
+        
+        -- Уведомление об активации
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Активировано",
+            Text = data.Name,
+            Duration = 2,
+            Icon = "rbxassetid://6726579484"
+        })
+    end)
+end
+
+-- Логика перемещения меню
+local dragging = false
+local dragStartPos, frameStartPos
+
+local function startDragging(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStartPos = Vector2.new(input.Position.X, input.Position.Y)
+        frameStartPos = mainFrame.Position
+        
+        -- Плавное изменение прозрачности при перетаскивании
+        mainFrame.BackgroundTransparency = 0.7
+    end
+end
+
+local function stopDragging(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+        mainFrame.BackgroundTransparency = 0
+    end
+end
+
+-- Можно перетаскивать за любую часть окна
+mainFrame.InputBegan:Connect(startDragging)
+dragFrame.InputBegan:Connect(startDragging)
+
+mainFrame.InputEnded:Connect(stopDragging)
+dragFrame.InputEnded:Connect(stopDragging)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = Vector2.new(input.Position.X, input.Position.Y) - dragStartPos
+        mainFrame.Position = UDim2.new(
+            frameStartPos.X.Scale, 
+            frameStartPos.X.Offset + delta.X, 
+            frameStartPos.Y.Scale, 
+            frameStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Логика сворачивания/разворачивания
+local minimized = false
+
+minimizeButton.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    
+    if minimized then
+        mainFrame.Visible = false
+        restoreButton.Visible = true
+        restoreButton.Position = UDim2.new(
+            0, mainFrame.AbsolutePosition.X, 
+            0, mainFrame.AbsolutePosition.Y
+        )
+    else
+        mainFrame.Visible = true
+        restoreButton.Visible = false
+    end
+end)
+
+restoreButton.MouseButton1Click:Connect(function()
+    minimized = false
+    mainFrame.Visible = true
+    restoreButton.Visible = false
+end)
+
+-- Обеспечиваем сохранение GUI после смерти
+player.CharacterAdded:Connect(function()
+    -- Убедимся, что GUI существует после возрождения
+    if not gui.Parent then
+        gui.Parent = player:WaitForChild("PlayerGui")
+    end
+end)
